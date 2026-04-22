@@ -1,0 +1,164 @@
+.top-label {
+    display:flex;
+    padding-bottom:5px;
+}
+.form-panel {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap; 
+}
+.dd-text-field {
+    width:300px;
+    height:31px;
+    padding-left: 10px;
+    border:1px solid rgb(118, 118, 118);
+    cursor: default;
+}
+.dd-option-box {
+    background: white;
+    color: black;
+    border-radius: 0px;
+    position: absolute;
+    z-index: 1000;
+    display: none;
+    border:1px solid rgb(118, 118, 118);
+}
+.dd-options {
+    max-height: 400px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+.dd-option {
+    padding: 5px 10px 5px 10px;
+    display:flex;
+}
+::-ms-input-placeholder {
+    color: var(--vscode-editor-foreground);
+}
+::placeholder {
+    color: var(--vscode-editor-foreground);
+    opacity: 1;
+}
+@keyframes dots {
+    0% { content: ".    "; }
+    25% { content: "..  "; }
+    50% { content: "... "; }
+    75% { content: "...."; }
+    100% { content: ""; }
+}
+.ui-progressbar-value {
+    background: #4daafc;
+}
+.ui-state-active {
+    border: 1px solid #4daafc !important;
+    background: #4daafc !important;
+}
+.progressbar {
+    height:2px;
+    border:none !important;    
+    margin-top: -10px;
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+.spinner{	
+    position: fixed;
+    top: 0;
+    z-index: 100;
+    width: 100%;
+    height:100%;
+    background: rgba(55, 55, 55, 0.5);
+}
+.cv-spinner {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;  
+}
+.spinner-circle {
+    width: 30px;
+    height: 30px;
+    border: 4px #2e93e6 solid;
+    border-top: 4px white solid;
+    border-radius: 50%;
+    animation: sp-anime 0.8s infinite linear;
+}
+@keyframes sp-anime {
+    100% { 
+      transform: rotate(360deg); 
+    }
+}
+.dt-scroll-body {
+    scrollbar-width:thin;
+}
+
+body, select, ul, li, textarea, div:not(.spinner, .cv-spinner, .ui-widget-overlay) , input, .ui-tabs, .ui-tabs-nav, .ui-state-default, .tab, .ui-tabs-tab {
+    background-color: var(--vscode-editor-background);
+    color: var(--vscode-editor-foreground);
+    font-family: var(--vscode-font-family) !important;
+    font-weight: var(--vscode-font-weight) !important;
+    font-size: var(--vscode-font-size) !important;
+}
+button {
+    background-color: var(--vscode-button-background);
+    color: var(--vscode-button-foreground);
+    font-family: var(--vscode-font-family) !important;
+    font-weight: var(--vscode-font-weight) !important;
+    font-size: var(--vscode-font-size) !important;
+    border:none;
+    padding:8px;
+} 
+
+button:disabled {
+    background-color: var(--vscode-button-secondaryBackground);
+    color: var(--vscode-button-secondaryForeground);
+    border: 1px solid rgb(118, 118, 118) !important;
+}
+button:not(:disabled):hover {
+    background-color: var(--vscode-button-hoverBackground);
+}
+.ui-tabs-anchor {
+    color: var(--vscode-editor-foreground) !important;
+}
+.ui-tabs-active a {
+    color: var(--vscode-button-foreground) !important;
+}
+.ui-tabs-nav{
+    border: none;
+    border-bottom: none;
+    padding: 0px !important;  
+}
+.ui-dialog-titlebar{
+    border: none;
+    border-bottom: 1px solid rgb(118, 118, 118);
+    border-bottom-right-radius:0;
+    border-bottom-left-radius:0;    
+}
+.ui-tabs-tab {
+    background-color: var(--vscode-editor-background) !important; 
+    border-radius: 0px;
+}
+.ui-tabs-active {
+    background: var(--vscode-button-background) !important;
+    border-radius: 0px;
+}
+table.dataTable>tbody>tr>* {
+    border-top: 1px solid rgb(118, 118, 118) !important;
+}
+.ui-widget.ui-widget-content {
+    border: none;
+}
+div.dt-container .dt-search input, .ui-tabs-panel {
+    border: 1px solid rgb(118, 118, 118) !important;
+    border-radius: 0px;
+}
+.select-row {
+    background-color: var(--vscode-button-background) !important;
+    color: var(--vscode-button-foreground) !important;
+}
+.ui-widget-overlay {
+    opacity: 1 !important;
+    background: rgba(55, 55, 55, 0.5) !important;
+}
+.dt-input {
+    width: 300px;
+}
