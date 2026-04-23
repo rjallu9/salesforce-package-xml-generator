@@ -569,7 +569,7 @@ function getWebviewContent(basedpath:string, scriptUri:vscode.Uri, cssUri:vscode
 					<div style="display:flex;justify-content:space-between;flex-wrap:wrap;">	
 						<div style="display:flex;">		
 							<div id="source-org" style="margin-right:5px;display:none;">	
-								<label for="text" for="source-org-field" class="top-label">Source Org:</label>
+								<label for="text" for="source-org-field" class="top-label">Org:</label>
 								<select type="text" class="source-org-field" id="source-org-field" style="height:36px;">
 								</select>		
 							</div>
@@ -608,9 +608,9 @@ function getWebviewContent(basedpath:string, scriptUri:vscode.Uri, cssUri:vscode
 									</div>
 								</div>				
 							</div>
-							<div id="source-actions" style="display:none;margin-left: 5px; padding-top: 22px;">
+							<div id="source-actions" style="display:none;margin-left:5px; padding-top: 22px;">
 								<button type="button" style="width:100px;" id="packagexml" disabled>Package.xml</button>								
-								<button type="button" style="width:130px;" id="download" disabled>Download (Metadata)</button>
+								<button type="button" style="width:160px;" id="download" disabled>Download (Metadata)</button>
 							</div>	
 						</div>	
 					</div>

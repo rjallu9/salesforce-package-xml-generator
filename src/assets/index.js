@@ -98,7 +98,6 @@ $(document).ready(function () {
 
     $("#hard-refresh").on('click', function (e) {
         resetComponents();
-        refreshTargetView(); 
         vscode.postMessage({ command: 'loadTypesComponents', sourceOrgId: $("#source-org-field").val(), refresh:true});
         $("#spinner").show();   
         $(".spinnerlabel").text("Refreshing Components");
@@ -400,7 +399,7 @@ $(document).ready(function () {
 
     $('#packagexml').on('click', function (e) {
         let packagexml = getPackageXml();
-        navigator.clipboard.writeText( `<?xml version="1.0" encoding="UTF-8"?>\n<Package xmlns="http://soap.sforce.com/2006/04/metadata">\n${packagexml}\t<version>62.0</version>\n</Package>`);
+        navigator.clipboard.writeText( `<?xml version="1.0" encoding="UTF-8"?>\n<Package xmlns="http://soap.sforce.com/2006/04/metadata">\n${packagexml}\t<version>66.0</version>\n</Package>`);
         vscode.postMessage({ command: 'toastMessage', message: 'Package.xml copied to clipboard'});
     });
 
