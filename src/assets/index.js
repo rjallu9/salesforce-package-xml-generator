@@ -21,8 +21,8 @@ $(document).ready(function () {
     window.addEventListener('message', (event) => {
         if(event.data.command === 'orgsList') {
             orgs = event.data.orgs;
-            $("#source-org").show();
-            $("#source-org-refresh").show();
+            $("#org").show();
+            $("#org-refresh").show();
             $("#spinner").hide();
             loadSourceOrgs();
         } else if(event.data.command === 'loading') {
@@ -64,28 +64,28 @@ $(document).ready(function () {
     });
 
     function loadSourceOrgs() {
-        $('#source-org-field').empty();
-        $('#source-org-field').append($("<option>").val('').text(''));
+        $('#org-field').empty();
+        $('#org-field').append($("<option>").val('').text(''));
         orgs.forEach(org => {
-            $('#source-org-field').append($("<option>").val(org.orgId).text(org.name));
+            $('#org-field').append($("<option>").val(org.orgId).text(org.name));
         });
     } 
 
-    $('#source-org-field').on("change", function(e){    
+    $('#org-field').on("change", function(e){    
         resetComponents();  
         $("#compTypes").hide();
         $("#errors").text('');
         $('#tabs').hide();
         $("#refresh-lbl").hide();  
         $("#source-actions").hide();
-        if($('#source-org-field').val() !== '') {
+        if($('#org-field').val() !== '') {
             vscode.postMessage({ command: 'loadTypesComponents', sourceOrgId: $(this).val(), refresh:false});
             $("#spinner").show();   
             $(".spinnerlabel").text("Refreshing Components");
         }       
     });
 
-    $("#source-org-refresh").on('click', function (e) {
+    $("#org-refresh").on('click', function (e) {
         resetComponents();
         $("#compTypes").hide();
         $("#errors").text('');
@@ -98,7 +98,7 @@ $(document).ready(function () {
 
     $("#hard-refresh").on('click', function (e) {
         resetComponents();
-        vscode.postMessage({ command: 'loadTypesComponents', sourceOrgId: $("#source-org-field").val(), refresh:true});
+        vscode.postMessage({ command: 'loadTypesComponents', sourceOrgId: $("#org-field").val(), refresh:true});
         $("#spinner").show();   
         $(".spinnerlabel").text("Refreshing Components");
     });
@@ -407,7 +407,7 @@ $(document).ready(function () {
         $(".spinnerlabel").text("Downloading");
         $("#spinner").show();
         let packagexml = getPackageXml();
-        vscode.postMessage({ command: 'download', sourceOrgId: $('#source-org-field').val(), packagexml:packagexml});  
+        vscode.postMessage({ command: 'download', sourceOrgId: $('#org-field').val(), packagexml:packagexml});  
     });  
 
     function getPackageXml() {

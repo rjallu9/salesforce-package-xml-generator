@@ -568,13 +568,13 @@ function getWebviewContent(basedpath:string, scriptUri:vscode.Uri, cssUri:vscode
 					</div>
 					<div style="display:flex;justify-content:space-between;flex-wrap:wrap;">	
 						<div style="display:flex;">		
-							<div id="source-org" style="margin-right:5px;display:none;">	
-								<label for="text" for="source-org-field" class="top-label">Org:</label>
-								<select type="text" class="source-org-field" id="source-org-field" style="height:36px;">
+							<div id="org" style="margin-right:5px;display:none;">	
+								<label for="text" for="org-field" class="top-label">Org:</label>
+								<select type="text" class="org-field" id="org-field" style="height:36px;">
 								</select>		
 							</div>
 							<div>
-								<p id="source-org-refresh" style="margin-bottom:0;margin-top:25px;margin-right:5px;cursor:pointer;display:none;" title="Refresh Orgs">
+								<p id="org-refresh" style="margin-bottom:0;margin-top:25px;margin-right:5px;cursor:pointer;display:none;" title="Refresh Orgs">
 									<svg width="25" height="25" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
 										<circle cx="512" cy="512" r="512" fill="#0078d4"></circle>
 										<path d="M512 281.6c71.221 0 136.396 32.619 179.2 85.526V256h51.2v204.8H537.6v-51.2h121.511c-32.857-47.165-87.235-76.8-147.111-76.8-98.97 0-179.2 80.23-179.2 179.2 0 98.97 80.23 179.2 179.2 179.2v-.02c73.665 0 138.994-44.857 166.176-111.988l47.458 19.216C690.689 684.711 606.7 742.38 512 742.38v.02c-127.246 0-230.4-103.154-230.4-230.4 0-127.246 103.154-230.4 230.4-230.4z" fill="white" fill-rule="nonzero"></path>
