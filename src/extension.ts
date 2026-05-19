@@ -351,8 +351,9 @@ function getTypesComponents(orgId:string, globalStorageUri:string, panel:vscode.
 												const objs = result['readMetadataResponse']['result']['records'];
 												objs.forEach((obj:any) => {
 													let tmp:string[] = [];
-													if(obj['fields']) {
-														obj['fields'].forEach((e:any) => {
+													if(obj['fields'] && obj['fields'] !== null) {
+														let fieldsList = obj['fields'] instanceof Array ? obj['fields'] : [obj['fields']];
+														fieldsList.forEach((e:any) => {
 															if(!e['fullName'].endsWith('__c')) {
 																tmp.push(obj['fullName']+'.'+e['fullName']);
 															}
@@ -648,6 +649,12 @@ function getWebviewContent(basedpath:string, scriptUri:vscode.Uri, cssUri:vscode
 							<div id="source-actions" style="display:none;margin-left:5px; padding-top: 22px;">
 								<button type="button" style="width:100px;" id="packagexml" disabled>Package.xml</button>								
 								<button type="button" style="width:160px;" id="download" disabled>Download (Metadata)</button>
+								<button type="button" style="width:120px;" id="import">Import & Edit</button>
+								<div id="import-dialog" title="Import">
+									<p>Package.xml</p>
+									<textarea id="importxml" name="importxml" rows="18" style="line-height:20px;scrollbar-width:thin;resize:none;width:100%;"></textarea>
+									<button type="button" style="width:70px;float:right;padding: 5px;margin-right:5px;" id="importcontinue">Continue</button>
+								</div>
 							</div>	
 						</div>	
 					</div>

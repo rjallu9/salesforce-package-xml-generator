@@ -394,7 +394,6 @@ $(document).ready(function () {
         $('#selectedtable').DataTable().clear().rows.add(Array.from(selectedComps.values())).draw(); 
         $('#selectedtable').DataTable().column(5).visible(false);
         $('#deleteall-row-chk').prop('checked', selectedComps.size > 0);
-        refreshTargetView();
     }
 
     $('#packagexml').on('click', function (e) {
@@ -410,6 +409,25 @@ $(document).ready(function () {
         let packagexml = getPackageXml();
         vscode.postMessage({ command: 'download', sourceOrgId: $('#org-field').val(), packagexml:packagexml});  
     });  
+
+    $('#import-dialog').dialog({autoOpen: false, modal: true, closeOnEscape: true, width: 500, height:'auto'});
+    $("#import").on("click", function(e){
+        $('#import-dialog').dialog("open");
+    });
+
+    $('#importcontinue').on('click', function (e) {
+        if($('#importxml').val().trim() !== '') {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString($('#importxml').val().trim(), "application/xml");
+
+            var components = [...doc.querySelectorAll("types")].flatMap((typeNode) => {
+                const name = typeNode.querySelector("name")?.textContent?.trim();
+                return [...typeNode.querySelectorAll("members")].map((m) => `${name}.${m.textContent.trim()}`);
+            });
+            autoSelection(components);           
+            $('#import-dialog').dialog("close");
+        }    
+    });
 
     function getPackageXml() {
         var comps = new Map();
@@ -430,6 +448,28 @@ $(document).ready(function () {
             packagexml += '\t</types>\n';
         });
         return packagexml;
+    }
+
+    function autoSelection(components) {
+        let types = new Set();
+        components.forEach(comp => {
+            if(componentsMap.has(comp.split('.')[0])) {
+                selectedTypes.add(comp.split('.')[0]);       
+                types.add(comp.split('.')[0]);
+            }        
+        });
+        types.forEach(type => {
+            componentsMap.get(type).forEach(cmp => {
+                if(components.indexOf(cmp.type+"."+cmp.name) >= 0) {
+                    selectedComps.set(cmp.type+"."+cmp.name, cmp);
+                    components.splice(components.indexOf(cmp.type+"."+cmp.name), 1);
+                }
+            });
+        });
+        refreshTypes();
+        refreshComponents();
+        refreshSelection();
+        return components;
     }
 
     $(".tab").on('click', function (e) {
