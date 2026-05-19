@@ -12,6 +12,8 @@ let STD_VALUE_SET = stdValueSet;
 let orgsList: any[] = [];
 var orgsListPath = '';
 var fsPath = '';
+var vsContext: vscode.ExtensionContext;
+let globalStorageUri = '';
 
 export function activate(context: vscode.ExtensionContext) {
 	const disposable = vscode.commands.registerCommand('salesforce-package-xml-generator.build', () => {
@@ -34,20 +36,36 @@ export function activate(context: vscode.ExtensionContext) {
 
 			let isCancelDeploy = false;
 
+			vsContext = context;
 			tmpDirectory = context.globalStorageUri.fsPath+"/tmp";
 			fsPath = context.globalStorageUri.fsPath;
-			orgsListPath = path.join(context.globalStorageUri.fsPath, 'orgsListV2.json');
+			orgsListPath = path.join(context.globalStorageUri.fsPath, 'orgsListV3.json');
 
 			panel.webview.onDidReceiveMessage((message) => {
 				switch (message.command) {
 					case 'getAuthOrgs':	
-						if (fs.existsSync(orgsListPath) && !message.refresh) {
+						if (fs.existsSync(orgsListPath)) {
 							orgsList = JSON.parse(fs.readFileSync(orgsListPath, 'utf-8'));
-							panel.webview.postMessage({ command: 'orgsList', orgs: orgsList});
-						} else {
-							if(fs.existsSync(orgsListPath)) {
-								orgsList = JSON.parse(fs.readFileSync(orgsListPath, 'utf-8'));
-							}
+							Promise.all(
+								orgsList.map(org =>
+									Promise.all([
+										vsContext.secrets.get(`sf-access-token-${org.orgId}`),
+										vsContext.secrets.get(`sf-refresh-token-${org.orgId}`)
+									]).then(([accessToken, refreshToken]) => ({
+										...org,
+										accessToken,
+										refreshToken
+									}))
+								)
+							).then((orgsWithTokens) => {
+								orgsList = orgsWithTokens;
+								if(!message.refresh) {
+									panel.webview.postMessage({ command: 'orgsList', orgs: orgsList});
+								}
+							});								
+						} 
+						
+						if(message.refresh || !fs.existsSync(orgsListPath)) {
 							getAuthOrgs().then((result:any) => {
 								panel.webview.postMessage({command: 'orgsList', orgs: orgsList});		
 							}).catch((error) => {
@@ -176,10 +194,13 @@ function validateSession(orgId:string) {
 				}
 			).then((response:any) => {
 				org.accessToken = response.data.access_token;
-				fs.writeFile(orgsListPath, JSON.stringify(orgsList, null, 2), 'utf8', (err:any) => {}); 	
-				sendSoapAPIRequest(orgId, '<urn:getUserInfo/>')
-				.then((result:any) => {
-					resolve({valid: true});
+				return new Promise((resolve, reject) => {	
+					vsContext.secrets.store( `sf-access-token-${org.orgId}`, org.accessToken)
+				}).then(() => {
+					sendSoapAPIRequest(orgId, '<urn:getUserInfo/>')
+					.then((result:any) => {
+						resolve({valid: true});
+					});
 				});
 			})
 			.catch((error:any) => {
@@ -330,13 +351,15 @@ function getTypesComponents(orgId:string, globalStorageUri:string, panel:vscode.
 												const objs = result['readMetadataResponse']['result']['records'];
 												objs.forEach((obj:any) => {
 													let tmp:string[] = [];
-													obj['fields'].forEach((e:any) => {
-														if(!e['fullName'].endsWith('__c')) {
-															tmp.push(obj['fullName']+'.'+e['fullName']);
-														}
-													});
-													sobjects.set(obj['fullName'], tmp);
-													panel.webview.postMessage({ command: 'stdFields', name:obj['fullName'], fields: tmp});
+													if(obj['fields']) {
+														obj['fields'].forEach((e:any) => {
+															if(!e['fullName'].endsWith('__c')) {
+																tmp.push(obj['fullName']+'.'+e['fullName']);
+															}
+														});
+														sobjects.set(obj['fullName'], tmp);
+														panel.webview.postMessage({ command: 'stdFields', name:obj['fullName'], fields: tmp});
+													}
 												});	
 											}).catch(error => {
 												vscode.window.showErrorMessage(`Error ${error}`);
@@ -507,10 +530,10 @@ function getAuthOrgs() {
 												name: `${org.alias}(${org.username})`,
 												alias: org.alias,
 												orgId: org.orgId,
-												accessToken: display.accessToken,
 												instanceUrl: display.instanceUrl,
+												apiVersion: display.apiVersion,
 												refreshToken,
-												apiVersion: display.apiVersion
+												accessToken:display.accessToken
 											});
 										}
 									} catch (e) {
@@ -525,9 +548,25 @@ function getAuthOrgs() {
 						const dir = path.dirname(orgsListPath);
 						if (!fs.existsSync(dir)) {
 							fs.mkdirSync(dir, { recursive: true });
-						}	
-						fs.writeFile(orgsListPath, JSON.stringify(orgsList, null, 2), 'utf8', (err:any) => {}); 	
-						resolve(orgsList);
+						}
+						Promise.all(
+							orgsList.flatMap(org =>
+								[
+									vsContext.secrets.store( `sf-access-token-${org.orgId}`, org.accessToken),
+									vsContext.secrets.store( `sf-refresh-token-${org.orgId}`, org.refreshToken)
+								]
+							)
+						).then(() => {
+							const sanitizedOrgs = orgsList.map(org => ({
+								name: org.name,
+								alias: org.alias,
+								orgId: org.orgId,
+								instanceUrl: org.instanceUrl,
+								apiVersion: org.apiVersion,
+							}));
+							fs.writeFile(orgsListPath, JSON.stringify(sanitizedOrgs, null, 2), 'utf8', (err:any) => {}); 	
+							resolve(orgsList);
+						});	
 					});
                 } catch (parseError:any) {
                     reject(`Parse Error: ${parseError.message}`);
@@ -668,5 +707,17 @@ export function deactivate() {
         } catch (err) {
         }
     }
+	
+	try {
+		fs.readdir(fsPath, (err:any, files:any[]) => {
+			files.filter(file => file.endsWith('.json') && file !== 'orgsListV3.json')
+				.forEach(file => {
+					console.log(file);
+					const filePath = path.join(fsPath, file);
+					fs.rmSync(filePath);
+				});
+		});
+	} catch (err) {
+	}
 }
 

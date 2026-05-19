@@ -399,7 +399,8 @@ $(document).ready(function () {
 
     $('#packagexml').on('click', function (e) {
         let packagexml = getPackageXml();
-        navigator.clipboard.writeText( `<?xml version="1.0" encoding="UTF-8"?>\n<Package xmlns="http://soap.sforce.com/2006/04/metadata">\n${packagexml}\t<version>66.0</version>\n</Package>`);
+        var org = orgs.find((org) => org.orgId === $('#org-field').val());	
+        navigator.clipboard.writeText( `<?xml version="1.0" encoding="UTF-8"?>\n<Package xmlns="http://soap.sforce.com/2006/04/metadata">\n${packagexml}\t<version>${org.apiVersion}</version>\n</Package>`);
         vscode.postMessage({ command: 'toastMessage', message: 'Package.xml copied to clipboard'});
     });
 
