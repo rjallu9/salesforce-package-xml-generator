@@ -297,7 +297,7 @@ function getTypesComponents(orgId:string, globalStorageUri:string, panel:vscode.
 							panel.webview.postMessage({ command: 'components', components:results, type:e.name });
 							const mdobjects = new Set(results.map(obj => obj.name));
 
-							var fieldsPath = path.join(fsPath+"/"+orgId, 'stdFields.json');
+							var fieldsPath = path.join(fsPath+"/"+orgId, 'stdFieldsV2.json');
 							if (fs.existsSync(fieldsPath)) {
 								sobjects = new Map(JSON.parse(fs.readFileSync(fieldsPath, 'utf-8')));
 							}
@@ -317,28 +317,26 @@ function getTypesComponents(orgId:string, globalStorageUri:string, panel:vscode.
 									});
 									if(objects.length > 0) {
 										const chunks = [];
-										for (let i = 0; i < objects.length; i += 100) {
-											chunks.push(objects.slice(i, i + 100));
+										for (let i = 0; i < objects.length; i += 10) {
+											chunks.push(objects.slice(i, i + 10));
 										}
 										return Promise.all(chunks.map((chunk:string[]) => {
 											var payload = '';
 											chunk.forEach((e:any) => {
-												payload += '<urn:sObjectType>'+e+'</urn:sObjectType>';
+												payload += '<met:fullNames>'+e+'</met:fullNames>';
 											});
-											return sendSoapAPIRequest(orgId, '<urn:describeSObjects>'+ payload + '</urn:describeSObjects>')
+											return sendSoapMDRequest(orgId, '<met:readMetadata><met:type>CustomObject</met:type>'+ payload + '</met:readMetadata>')
 											.then((result:any) => {
-												const objs = result['describeSObjectsResponse']['result'];
-												const exclFields = new Set(['Id', 'IsDeleted', 'CreatedById', 'CreatedDate', 'LastModifiedById', 'LastModifiedDate', 
-													'LastReferencedDate', 'LastViewedDate', 'SystemModstamp', 'MasterRecordId', 'LastActivityDate']);
+												const objs = result['readMetadataResponse']['result']['records'];
 												objs.forEach((obj:any) => {
 													let tmp:string[] = [];
 													obj['fields'].forEach((e:any) => {
-														if(e['custom'] === 'false' && !exclFields.has(e['name']) && (e['compoundFieldName'] === undefined || e['compoundFieldName'] === 'Name')) {
-															tmp.push(obj['name']+'.'+e['name']);
+														if(!e['fullName'].endsWith('__c')) {
+															tmp.push(obj['fullName']+'.'+e['fullName']);
 														}
 													});
-													sobjects.set(obj['name'], tmp);
-													panel.webview.postMessage({ command: 'stdFields', name:obj['name'], fields: tmp});
+													sobjects.set(obj['fullName'], tmp);
+													panel.webview.postMessage({ command: 'stdFields', name:obj['fullName'], fields: tmp});
 												});	
 											}).catch(error => {
 												vscode.window.showErrorMessage(`Error ${error}`);
