@@ -8,7 +8,7 @@
     "url": "https://github.com/rjallu9/salesforce-package-xml-generator/issues"
   },
   "license": "BSD-3-Clause",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "icon": "logo.png",
   "keywords": [
     "sfdx",

@@ -194,9 +194,7 @@ function validateSession(orgId:string) {
 				}
 			).then((response:any) => {
 				org.accessToken = response.data.access_token;
-				return new Promise((resolve, reject) => {	
-					vsContext.secrets.store( `sf-access-token-${org.orgId}`, org.accessToken)
-				}).then(() => {
+				return vsContext.secrets.store( `sf-access-token-${org.orgId}`, org.accessToken).then(() => {
 					sendSoapAPIRequest(orgId, '<urn:getUserInfo/>')
 					.then((result:any) => {
 						resolve({valid: true});
